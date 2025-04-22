@@ -1,14 +1,10 @@
-from fastapi import FastAPI, File, UploadFile, HTTPException, Form
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from typing import List
 from app.app_modules import EmotionRecognitionAssistant
 import shutil
 import os
-from pydantic import BaseModel
-
-class ChatInput(BaseModel):
-    user_input: str
 
 app = FastAPI(
     title="Emotion Recognition API",
@@ -44,12 +40,12 @@ async def analyze_file(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/chat/", response_model=str, summary="Chat with the emotion analysis assistant")
-async def chat_with_assistant(input_data: ChatInput):
+async def chat_with_assistant(user_input: str):
     """
     Sends a message to the emotion analysis assistant and receives its response
     based on the previously analyzed file.
     """
-    response = assistant.chat(input_data.user_input)
+    response = assistant.chat(user_input)
     return response
 
 @app.get("/health/", status_code=200, summary="Health check")
